@@ -1,5 +1,5 @@
 # Using: 
-Clerk Auth
-MUI Materials
-Stripe API
-OpenAI API
+- Clerk Auth
+- MUI Materials
+- Stripe API
+- OpenAI API
