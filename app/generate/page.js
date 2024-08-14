@@ -3,12 +3,21 @@
 import { useUser } from "@clerk/nextjs"
 import { useState } from "react"
 import { useRouter } from "next/router"
+import { db } from "@/firebase"
 import {
     Container,
     TextField,
     Button,
     Typography,
     Box,
+    Grid,
+    CardActionArea,
+    CardContent,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
   } from '@mui/material'
 
 export default function Generate(){
@@ -26,7 +35,7 @@ export default function Generate(){
             body: text,
         })
             .then((res)=>res.json())
-            .then((data)> setFlashcards(data))
+            .then((data) => setFlashcards(data)) // This line was causing an error, it's fixed now
     }
 
     const handleCardClick = (id) => {
@@ -37,11 +46,11 @@ export default function Generate(){
     }
     
     const handleOpen = () => {
-        setOpenI(true)
+        setOpen(true)
     }
         
     const handleClose = () => {
-        setOpenI(false)
+        setOpen(false)
     }
     
     const saveFlashcards = async () => {
@@ -106,7 +115,99 @@ export default function Generate(){
             </Button>
           </Box>
           
-          {/* We'll add flashcard display here */}
+          {flashcards.length > 9 && (<Box sx = {{mt:4}}>
+            <Typography variant = "h5">Flashcards Preview</Typography>
+            <Grid containter spacing = {3}>
+              {flashcards.map((flashcards, index ) => (
+                <Grid item xs = {12} sm = {6} md = {4} key = {index}>
+                  <Card>
+                    <CardActionArea 
+                      onClick={() => {
+                        handleCardClick(index)          
+                      }}
+                      ><CardContent>
+                        <Box sx={{
+                          perspective: '1000px',
+                          '& > div':{
+                            transition: 'transform 0.6s',
+                            transformStyle: 'preserve-3d',
+                            position:'relative',
+                            width:'100%',
+                            height:'200px',
+                            boxShadow:'0 4px 8px 0 rgba{0,0,0, 0.2}',
+                            transform: flipped[index]? 'rotateY(180deg)': 'rotateY(0deg)',
+                          },
+                          '& > div > div':{
+                            position: 'absolute',
+                            width:'100%',
+                            height:'100%',
+                            backfaceVisibility: 'hidden',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 2,
+                            boxSizing: 'border-box'
+                          },
+                          '& > div > div:nth-of-type(2)':{
+                            transform: 'rotateY(180deg)'
+                          
+                          },
+                        }}>
+                          <div>
+                            <div>
+                              <Typography 
+                                variant = "h5" 
+                                component= "div"
+                                >{flashcard.front}
+                                </Typography>
+                            </div>
+                            <div>
+                              <Typography 
+                                variant = "h5" 
+                                component= "div"
+                                >{flashcard.back}
+                                </Typography>
+                            </div>
+                          </div>
+                        </Box>
+                      </CardContent>
+                    </CardActionArea> 
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+              <Box sx = {{mt: 4, display:'flex', justifyContent: 'center'}}>
+                <Button variant = 'contained' color = 'secondary' onClick={handleOpen}>
+                  Save
+                </Button>
+              </Box>
+          </Box>
+          )}
+          <Dialog open = {open} onClose={handleClose}>
+            <DialogTitle>Save Flashcards</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please enter a name for your collection
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                label = "Collection Name"
+                type="text"
+                fullWidth value = {name} 
+                onChange={(e) => setName(e.target.value)}
+                variant = "outlined"
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button onClick={saveFlashcards}>
+                Save
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Container>
       )
 }

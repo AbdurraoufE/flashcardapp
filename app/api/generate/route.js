@@ -12,7 +12,7 @@ const systemPrompt = `
     3. **Topic Variety**: Create flashcards on a wide range of topics, including but not limited to science, mathematics, history, languages, and general knowledge. Ensure the content is suitable for the intended audience.
     4. **Difficulty Levels**: Vary the difficulty levels of the flashcards to cater to different learning stages. Clearly label the difficulty level (e.g., beginner, intermediate, advanced) on each flashcard.
     5. **Engagement**: Make the flashcards engaging by using interesting facts, visuals, or mnemonics where appropriate. Aim to make learning enjoyable and memorable.
-
+    6. Only generate 10 flashcards
     Guidelines:
     - Use simple and direct language.
     - Avoid jargon unless it's necessary and well-explained.
@@ -43,6 +43,7 @@ export async function POST(req) {
             { role: "user", content: data },
         ],
         model: "gpt-4",
+        response_format: {type: 'json_object'} //This was missing 
     });
 
     // Parse response
