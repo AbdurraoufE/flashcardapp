@@ -19,6 +19,8 @@ import {
     DialogContentText,
     DialogActions,
   } from '@mui/material'
+import { useRouter } from "next/navigation"
+import {doc , collection, setDoc, getDoc, writeBatch} from 'firebase/firestore'
 
 export default function Generate(){
     const {isLoaded, isSignedIn, user} = useUser()
@@ -81,7 +83,7 @@ export default function Generate(){
         const colRef = collection(userDocRef, name)
         flashcards.forEach((flashcard)=>{
             const cardDocRef = doc(colRef)
-            batch.set(cardDocRef,flashcard)
+            batch.set(cardDocRef, flashcard)
         })
 
         await batch.commit()
