@@ -34,19 +34,38 @@ const systemPrompt = `
 `;
 
 export async function POST(req) {
-    const openai = new OpenAI(); // Correct instantiation
-    const data = await req.text();
+    try {
+        const openai = new OpenAI();
+        const data = await req.json();
 
-    const completion = await openai.chat.completions.create({
-        messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: data },
-        ],
-        model: "gpt-4",
-        response_format: {type: 'json_object'} //This was missing 
-    });
+        const completion = await openai.chat.completions.create({
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: data.text },
+            ],
+            model: 'gpt-4',
+        });
 
-    // Parse response
-    const flashcards = JSON.parse(completion.choices[0].message.content);
-    return NextResponse.json(flashcards.flashcards);
+        const messageContent = completion.choices[0]?.message?.content;
+
+        if (!messageContent) {
+            throw new Error('No content found in response message');
+        }
+
+        let flashcards;
+        try {
+            flashcards = JSON.parse(messageContent);
+        } catch (e) {
+            throw new Error('Error parsing flashcards JSON');
+        }
+
+        if (!flashcards || !Array.isArray(flashcards.flashcards)) {
+            throw new Error('Invalid flashcards format');
+        }
+
+        return NextResponse.json(flashcards.flashcards);
+    } catch (error) {
+        console.error('Error generating flashcards:', error.message);
+        return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 500 });
+    }
 }
