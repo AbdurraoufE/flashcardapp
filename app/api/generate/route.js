@@ -12,7 +12,7 @@ const systemPrompt = `
     3. **Topic Variety**: Create flashcards on a wide range of topics, including but not limited to science, mathematics, history, languages, and general knowledge. Ensure the content is suitable for the intended audience.
     4. **Difficulty Levels**: Vary the difficulty levels of the flashcards to cater to different learning stages. Clearly label the difficulty level (e.g., beginner, intermediate, advanced) on each flashcard.
     5. **Engagement**: Make the flashcards engaging by using interesting facts, visuals, or mnemonics where appropriate. Aim to make learning enjoyable and memorable.
-
+    6. Only generate 10 flashcards
     Guidelines:
     - Use simple and direct language.
     - Avoid jargon unless it's necessary and well-explained.
@@ -34,18 +34,38 @@ const systemPrompt = `
 `;
 
 export async function POST(req) {
-    const openai = new OpenAI(); // Correct instantiation
-    const data = await req.text();
+    try {
+        const openai = new OpenAI();
+        const data = await req.json();
 
-    const completion = await openai.chat.completions.create({
-        messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: data },
-        ],
-        model: "gpt-4",
-    });
+        const completion = await openai.chat.completions.create({
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: data.text },
+            ],
+            model: 'gpt-4',
+        });
 
-    // Parse response
-    const flashcards = JSON.parse(completion.choices[0].message.content);
-    return NextResponse.json(flashcards.flashcards);
+        const messageContent = completion.choices[0]?.message?.content;
+
+        if (!messageContent) {
+            throw new Error('No content found in response message');
+        }
+
+        let flashcards;
+        try {
+            flashcards = JSON.parse(messageContent);
+        } catch (e) {
+            throw new Error('Error parsing flashcards JSON');
+        }
+
+        if (!flashcards || !Array.isArray(flashcards.flashcards)) {
+            throw new Error('Invalid flashcards format');
+        }
+
+        return NextResponse.json(flashcards.flashcards);
+    } catch (error) {
+        console.error('Error generating flashcards:', error.message);
+        return NextResponse.json({ error: 'Failed to generate flashcards' }, { status: 500 });
+    }
 }
