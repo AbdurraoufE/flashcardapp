@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import db from "@/firebase";
-import { useSearchParams } from "next/navigation";
+import { useUser } from "@clerk/nextjs"
+import { useEffect, useState } from "react"
+import { collection, doc, getDoc, getDocs } from "firebase/firestore"
+import db from "@/firebase"
+import { useSearchParams } from "next/navigation"
 import {
   Container,
   TextField,
@@ -20,40 +20,40 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-} from "@mui/material";
+} from "@mui/material"
 
 export default function Flashcard() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const [flashcards, setFlashcards] = useState([]);
-  const [flipped, setFlipped] = useState([]);
+  const { isLoaded, isSignedIn, user } = useUser()
+  const [flashcards, setFlashcards] = useState([])
+  const [flipped, setFlipped] = useState([])
 
-  const searchParams = useSearchParams();
-  const search = searchParams.get("id"); //get the id of the page
+  const searchParams = useSearchParams()
+  const search = searchParams.get("id") //get the id of the page
 
   useEffect(() => {
     async function getFlashcard() {
-      if (!search || !user) return;
-      const colRef = collection(doc(collection(db, "users"), user.id), search);
-      const docs = await getDocs(colRef); // get all documents in the collection reference
-      const flashcards = [];
+      if (!search || !user) return
+      const colRef = collection(doc(collection(db, "users"), user.id), search)
+      const docs = await getDocs(colRef) // get all documents in the collection reference
+      const flashcards = []
 
       docs.forEach((doc) => {
-        flashcards.push({ id: doc.id, ...doc.data() });
-      });
-      setFlashcards(flashcards);
+        flashcards.push({ id: doc.id, ...doc.data() })
+      })
+      setFlashcards(flashcards)
     }
-    getFlashcard();
-  }, [user, search]);
+    getFlashcard()
+  }, [user, search])
 
   const handleCardClick = (id) => {
     setFlipped((prev) => ({
       ...prev,
       [id]: !prev[id],
-    }));
-  };
+    }))
+  }
 
   if (!isLoaded || !isSignedIn) {
-    return <></>;
+    return <></>
   }
 
   return (
@@ -114,5 +114,5 @@ export default function Flashcard() {
         ))}
       </Grid>
     </Container>
-  );
+  )
 }
