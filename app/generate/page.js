@@ -40,7 +40,7 @@ export default function Generate() {
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    origin: 'https://localhost:3000',
                 },
                 body: JSON.stringify({ text: inputText }), //text you add in the box 
             });

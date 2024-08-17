@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image"
 import getStripe from "@/utils/get-stripe"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
@@ -17,30 +18,47 @@ import Head from "next/head"
 
 export default function Home() {
   const handleSubmit = async () => {
-    const checkoutSession = await fetch("/api/checkout_session", {
-      method: "POST",
-      headers: {
-        origin: "https://localhost:3000",
-      },
-    })
-
-    const checkoutSessionJson = await checkoutSession.json()
-
-    // Some error handling
-    if (checkoutSession.statusCode === 500) {
-      console.error(checkoutSession.message)
-      return
+    try {
+      // fetch the checkout session from server
+      const response = await fetch('/api/checkout_session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:3000',
+        },
+      });
+  
+      // Handle non-OK response status
+      if (!response.ok) {
+        const errorText = await response.text(); // Get error details if available
+        throw new Error(`Network response was not ok: ${errorText}`);
+      }
+  
+      // Parse JSON response
+      const checkoutSessionJson = await response.json();
+  
+      // Ensure the session ID is present
+      if (!checkoutSessionJson.id) {
+        throw new Error('No session ID returned from the server');
+      }
+  
+      // Initialize Stripe
+      const stripe = await getStripe();
+  
+      // Redirect to Checkout with the session ID
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: checkoutSessionJson.id,
+      });
+  
+      // Handle any errors that occur during redirect
+      if (error) {
+        console.warn('Error during redirectToCheckout:', error.message);
+      }
+    } catch (error) {
+      console.error('Error in handleSubmit:', error.message);
     }
-
-    const stripe = await getStripe()
-    const { error } = await stripe.redirectToCheckout({
-      sessionId: checkoutSession.id,
-    })
-
-    if (error) {
-      console.warn(error.message)
-    }
-  }
+  };
+  
   return (
     <Container maxWidth="lg">
       <Head>
@@ -171,7 +189,7 @@ export default function Home() {
                   variant="contained"
                   color="secondary"
                   fullWidth
-                  // onClick={handleSubmit} There is some error that occurs when this line is commented out, will fix later
+                  onClick={handleSubmit} //There is some error that occurs when this line is commented out, will fix later
                 >
                   Choose Pro
                 </Button>
