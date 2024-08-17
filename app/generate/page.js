@@ -43,7 +43,7 @@ export default function Generate() {
                     origin: 'https://localhost:3000',
                 },
                 body: JSON.stringify({ text: inputText }), //text you add in the box 
-            });
+            })
 
             if (response.ok) {
                 const data = await response.json();
@@ -80,14 +80,18 @@ export default function Generate() {
 
     const saveFlashcards = async () => {
         if (!name) {
-            alert("Please enter a name")
+            alert("Please enter a collection name")
+            return
+        }
+        if (!user || !user.id) {
+            alert("Create an account or log in to save your flashcards!")
             return
         }
 
         const batch = writeBatch(db)
-        const userDocRef = doc(collection(db, 'users'), user.id)
+        const userDocRef = doc(collection(db, 'users'), user.id) //error here
         const docSnap = await getDoc(userDocRef)
-
+        
         if (docSnap.exists()) {
             const collections = docSnap.data().flashcards || []
             if (collections.find((f) => f.name === name)) {
