@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs"
 import { useState } from "react"
 import { db } from "@/firebase"
+import { firestore } from '../../firebase'
 import {
     Container,
     TextField,
