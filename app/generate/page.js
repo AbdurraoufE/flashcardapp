@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs"
 import { useState } from "react"
 import { db } from "@/firebase"
+import { firestore } from '../../firebase'
 import {
     Container,
     TextField,
@@ -40,10 +41,10 @@ export default function Generate() {
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    origin: 'https://localhost:3000',
                 },
                 body: JSON.stringify({ text: inputText }), //text you add in the box 
-            });
+            })
 
             if (response.ok) {
                 const data = await response.json();
@@ -80,14 +81,18 @@ export default function Generate() {
 
     const saveFlashcards = async () => {
         if (!name) {
-            alert("Please enter a name")
+            alert("Please enter a collection name")
+            return
+        }
+        if (!user || !user.id) {
+            alert("Create an account or log in to save your flashcards!")
             return
         }
 
         const batch = writeBatch(db)
-        const userDocRef = doc(collection(db, 'users'), user.id)
+        const userDocRef = doc(collection(db, 'users'), user.id) //error here
         const docSnap = await getDoc(userDocRef)
-
+        
         if (docSnap.exists()) {
             const collections = docSnap.data().flashcards || []
             if (collections.find((f) => f.name === name)) {
