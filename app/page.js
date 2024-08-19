@@ -11,6 +11,48 @@ import PublicIcon from '@mui/icons-material/Public';
 import Head from "next/head"; 
 
 export default function Home() {
+  const handleSubmit = async () => {
+    try {
+      // fetch the checkout session from server
+      const response = await fetch('/api/checkout_session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': 'http://localhost:3000',
+        },
+      });
+  
+      // Handle non-OK response status
+      if (!response.ok) {
+        const errorText = await response.text(); // Get error details if available
+        throw new Error(`Network response was not ok: ${errorText}`);
+      }
+  
+      // Parse JSON response
+      const checkoutSessionJson = await response.json();
+  
+      // Ensure the session ID is present
+      if (!checkoutSessionJson.id) {
+        throw new Error('No session ID returned from the server');
+      }
+  
+      // Initialize Stripe
+      const stripe = await getStripe();
+  
+      // Redirect to Checkout with the session ID
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: checkoutSessionJson.id,
+      });
+  
+      // Handle any errors that occur during redirect
+      if (error) {
+        console.warn('Error during redirectToCheckout:', error.message);
+      }
+    } catch (error) {
+      console.error('Error in handleSubmit:', error.message);
+    }
+  };
+  
   return (
     <>
       <style jsx global>{`
@@ -76,15 +118,19 @@ export default function Home() {
     <Container maxWidth="lg" className="gradient-background" sx={{ flexGrow: 1 }}>
       <Head>
         <title>Flashcard App</title>
-        <meta name="description" content="Create flashcards"/>
+        <meta name="description" content="Create flashcards" />
       </Head>
       <AppBar position="static" className="appbar-background">
         <Toolbar>
           <DescriptionIcon edge="start" color="inherit" aria-label="flashcard" sx={{ mr: 2 }} />
           <Typography variant="h6" style={{ flexGrow: 1 }}>Flashcard App</Typography>
           <SignedOut>
-            <Button color="inherit" href="/sign-in">Login</Button>
-            <Button color="inherit" href="/sign-up">Sign Up</Button>
+            <Button color="inherit" href="/sign-in">
+              Login
+            </Button>
+            <Button color="inherit" href="/sign-up">
+              Sign Up
+            </Button>
           </SignedOut>
           <SignedIn>
             <UserButton />
@@ -193,14 +239,20 @@ export default function Home() {
     </Container>
 
       {/* Pricing Section */}
-      <Box sx={{ my: 6, textAlign: 'center' }}>
-        <Typography variant="h4" component="h2" gutterBottom>Pricing</Typography>
+      <Box sx={{ my: 6, textAlign: "center" }}>
+        <Typography variant="h4" component="h2" gutterBottom>
+          Pricing
+        </Typography>
         <Grid container spacing={4} justifyContent="center">
           <Grid item xs={12} sm={6} md={4}>
             <Card className="pricing-card">
               <CardContent>
-                <Typography variant="h5" component="h2">Normal Plan</Typography>
-                <Typography variant="h6" component="p">$5 / month</Typography>
+                <Typography variant="h5" component="h2">
+                  Normal Plan
+                </Typography>
+                <Typography variant="h6" component="p">
+                  $5 / month
+                </Typography>
               </CardContent>
               <CardActions>
                 <Button 
@@ -222,8 +274,12 @@ export default function Home() {
           <Grid item xs={12} sm={6} md={4}>
             <Card className="pricing-card">
               <CardContent>
-                <Typography variant="h5" component="h2">Pro Plan</Typography>
-                <Typography variant="h6" component="p">$10 / month</Typography>
+                <Typography variant="h5" component="h2">
+                  Pro Plan
+                </Typography>
+                <Typography variant="h6" component="p">
+                  $10 / month
+                </Typography>
               </CardContent>
               <CardActions>
                 <Button 
