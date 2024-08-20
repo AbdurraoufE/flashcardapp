@@ -1,6 +1,6 @@
 {
     "functions": {
-      "api/generate": {
+      "app/api/generate": {
         "maxDuration": 10
       }
     }
