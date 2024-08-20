@@ -41,7 +41,8 @@ export default function Generate() {
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {
-                    origin: 'https://aiflashcardapp.vercel.app/',
+                    // origin: 'https://aiflashcardapp.vercel.app/',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ text: inputText }), //text you add in the box 
             })
