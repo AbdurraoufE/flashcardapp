@@ -33,37 +33,23 @@ export default function Generate() {
     const router = useRouter()
     const [inputText, setInputText] = useState('');
     const [error, setError] = useState(null);
+    const [isFetching, setIsFetching] = useState(false);
 
-    async function handleSubmit(event) {
-        event.preventDefault();
-        
-        try {
-            const response = await fetch('/api/generate', {
-                method: 'POST',
-                headers: {
-                    // origin: 'https://aiflashcardapp.vercel.app/',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: inputText }), //text you add in the box 
-            })
-
-            if (response.ok) {
-                const data = await response.json();
-
-                if (Array.isArray(data) && data.length > 0) {
-                    setFlashcards(data); // update the flashcards state
-                } else {
-                    setFlashcards([]);
-                    setError('No flashcards found'); // error state if no flashcards
-                }
-            } else {
-                setError('Failed to fetch flashcards'); // error state for failed response
-            }
-        } catch (error) {
-            console.error('Error fetching flashcards:', error);
-            setError('An error occurred while generating flashcards'); // fetch error
-        }
-    }
+    const handleSubmit = async () => {
+        setIsFetching(true);
+        fetch("api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            setFlashcards(data);
+            setIsFetching(false);
+          });
+      };
 
     const handleCardClick = (id) => {
         setFlipped((prev) => ({
