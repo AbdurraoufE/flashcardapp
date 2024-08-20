@@ -27,29 +27,39 @@ export default function Generate() {
     const { isLoaded, isSignedIn, user } = useUser()
     const [flashcards, setFlashcards] = useState([])
     const [flipped, setFlipped] = useState([])
-    const [text, setText] = useState('')
+    const [inputText, setInputText] = useState('') // Use inputText for the input field
     const [name, setName] = useState('')
     const [open, setOpen] = useState(false)
     const router = useRouter()
-    const [inputText, setInputText] = useState('');
-    const [error, setError] = useState(null);
-    const [isFetching, setIsFetching] = useState(false);
+    const [error, setError] = useState(null)
+    const [isFetching, setIsFetching] = useState(false)
 
     const handleSubmit = async () => {
-        setIsFetching(true);
-        fetch("api/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            setFlashcards(data);
-            setIsFetching(false);
-          });
-      };
+        setIsFetching(true)
+        setError(null)
+
+        try {
+            const res = await fetch("/api/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ text: inputText }), // Pass inputText here
+            })
+
+            if (!res.ok) {
+                const errorText = await res.text()
+                throw new Error(errorText)
+            }
+
+            const data = await res.json()
+            setFlashcards(data)
+        } catch (err) {
+            setError(err.message || "Something went wrong, please try again.")
+        } finally {
+            setIsFetching(false)
+        }
+    }
 
     const handleCardClick = (id) => {
         setFlipped((prev) => ({
@@ -77,7 +87,7 @@ export default function Generate() {
         }
 
         const batch = writeBatch(db)
-        const userDocRef = doc(collection(db, 'users'), user.id) //error here
+        const userDocRef = doc(collection(db, 'users'), user.id)
         const docSnap = await getDoc(userDocRef)
         
         if (docSnap.exists()) {
@@ -106,14 +116,13 @@ export default function Generate() {
 
     return (
         <Container maxWidth="md">
-          {/* We'll add flashcard display here */}
             <Box sx={{ my: 4 }}>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Generate Flashcards
                 </Typography>
                 <TextField
                     value={inputText}
-                    onChange={(e) => setInputText(e.target.value)} // Update state on input change
+                    onChange={(e) => setInputText(e.target.value)} // Update inputText on input change
                     label="Enter text"
                     fullWidth
                     multiline
@@ -126,8 +135,9 @@ export default function Generate() {
                     color="primary"
                     onClick={handleSubmit}
                     fullWidth
+                    disabled={isFetching} // Disable button when fetching
                 >
-                    Generate Flashcards
+                    {isFetching ? 'Generating...' : 'Generate Flashcards'}
                 </Button>
                 {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
             </Box>
@@ -195,10 +205,15 @@ export default function Generate() {
                     </Box>
                 </Box>
             )}
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Save Flashcards</DialogTitle>
+            <Dialog 
+                open={open} 
+                onClose={handleClose} 
+                aria-labelledby="dialog-title"
+                aria-describedby="dialog-description"
+            >
+                <DialogTitle id="dialog-title">Save Flashcards</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
+                    <DialogContentText id="dialog-description">
                         Please enter a name for your collection
                     </DialogContentText>
                     <TextField
