@@ -6,6 +6,13 @@
 - Stripe API
 - OpenAI API
 
+# Features:
+- Log-in/log-out & Sign up option
+- Subscribe for plans (Normal and Pro)
+- Generate flashcards using AI
+- Save flashcards
+- Database to store your old flashcards
+
 # Screenshots:
 
 ![image](https://github.com/user-attachments/assets/5957dcff-b9b1-4910-b9a7-67431f83475d)
