@@ -43,7 +43,7 @@ export async function POST(req) {
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: data.text },
             ],
-            model: 'gpt-4',
+            model: 'gpt-4o-mini',
         });
 
         const messageContent = completion.choices[0]?.message?.content;
