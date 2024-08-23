@@ -1,4 +1,4 @@
-# 🚀 [Click to checkout the live website](https://flashcardapp-ai.vercel.app/) 🚀
+# 🚀 [Click to checkout the live website](https://flashcardapp-bdbs.vercel.app/) 🚀
 
 # Using: 
 - Clerk Auth
