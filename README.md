@@ -1,3 +1,5 @@
+# 🚀 [Click to checkout the live website](https://flashcardapp-ai.vercel.app/) 🚀
+
 # Using: 
 - Clerk Auth
 - MUI Materials
