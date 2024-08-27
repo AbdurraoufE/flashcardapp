@@ -1,19 +1,19 @@
 # 🚀 [Click to checkout the live website](https://flashcardapp-bdbs.vercel.app/) 🚀
 
-# Using: 
+# Using
 - Clerk Auth
 - MUI Materials
 - Stripe API
 - OpenAI API
 
-# Features:
+# Features
 - Log-in/log-out & Sign up option
 - Subscribe for plans (Normal and Pro)
 - Generate flashcards using AI
 - Save flashcards
 - Database to store your old flashcards
 
-# Screenshots:
+# Screenshots
 
 ![image](https://github.com/user-attachments/assets/5957dcff-b9b1-4910-b9a7-67431f83475d)
 ![image](https://github.com/user-attachments/assets/713a6994-28c9-4f09-b220-d08ec2a04fe6)
