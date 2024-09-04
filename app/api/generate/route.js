@@ -8,6 +8,8 @@ const systemPrompt = `
     Make sure to create exactly 5 flashcards.
     Both back and front should be one sentence long.
 
+    Make sure to display the front of all cards at first when loaded in.
+    Make sure to display the back of all cards when the card is clicked.
     Return in the following JSON format:
     {
         "flashcards": [
@@ -29,7 +31,7 @@ export async function POST(req) {
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: data.text },
             ],
-            model: 'gpt-4o-mini',
+            model: 'gpt-4',
         });
 
         const messageContent = completion.choices[0]?.message?.content;
